@@ -1,0 +1,25 @@
+.container {
+	width: 300px;
+	max-width: 100%;
+	margin: 0 auto;
+}
+.row {
+	width: 100%;
+}
+.cell {
+	width: 33.334%;
+	height: 100px;
+	float: left;
+	padding: 2px;
+}
+.cell-inner {
+	background-color: red;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	color: #fff;
+}
+.cell-inner i.fa {
+	font-size: 50px;
+	line-height: 100px;
+}
