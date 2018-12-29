@@ -1,20 +1,23 @@
 (function() {
 
 var gameContainer = document.querySelector('.container');
+var messageContainer = document.querySelector('.message-container');
+var messageBox = document.querySelector('.message');
+var playAgainBtn = document.querySelector('.replay-btn');
 var humanPlayer = {
   name: 'Arif',
   symbol: '<i class="fa fa-times"></i>'
 };
 var aiPlayer = {
-  name: 'Computer',
+  name: isMobile() ? 'Mobile' : 'Computer',
   symbol: '<i class="fa fa-circle-o"></i>'
 };
 var currentPlayer = humanPlayer;
 var winningCombinations = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
 var againstComputer = true;
 
-var gameData = [];
-for(var i = 0; i < 9; i++) gameData[i] = {checked: false};
+var gameData;
+makeGameData();
 
 
 function renderScreen() {
@@ -45,11 +48,13 @@ function changePlayer() {
 }
 
 function winning(gameData, player) {
-  return winningCombinations.some(function(combinations) {
-    return combinations.every(function(item) {
+  for(var i = 0; i < winningCombinations.length; i++) {
+
+    var isawin = winningCombinations[i].every(function(item) {
       return gameData[item].checked && gameData[item].player === player;
     });
-  });
+    if(isawin) return winningCombinations[i];
+  }
 }
 
 gameContainer.addEventListener('click', function(e) {
@@ -72,16 +77,51 @@ gameContainer.addEventListener('click', function(e) {
   }
 });
 
+
 function computerPay() {
+  if(isaTie()) {
+    showMessage('It was a tie!');
+    changePlayer();
+    return false;
+  }
   var spot = bestSpot();
   gameData[spot].checked = true;
   gameData[spot].player = currentPlayer;
   renderScreen();
-  if(winning(gameData, currentPlayer)) {
-    alert(currentPlayer.name + ' won!');
+  var combination = winning(gameData, currentPlayer);
+  if(typeof combination !== 'undefined') {
+    combination.forEach(function(item) {
+      document.querySelector("[data-index='"+item+"']").style.color = 'black';
+    });
+    setTimeout(function() {
+      showMessage('Your ' + currentPlayer.name + ' is unbeatable!');
+      changePlayer();
+    }, 1000);
+  } else {
+    changePlayer();
   }
-  changePlayer();
 }
+
+function showMessage(message) {
+  messageContainer.style.display = 'block';
+  messageBox.innerHTML = message;
+}
+function hideMessage() {
+  messageContainer.style.display = 'none';
+  messageBox.innerHTML = '';
+}
+
+function makeGameData() {
+  gameData = [];
+  for(var i = 0; i < 9; i++) gameData[i] = {checked: false};
+}
+
+function playAgain() {
+  hideMessage();
+  makeGameData();
+  renderScreen();
+}
+playAgainBtn.addEventListener('click', playAgain);
 
 function bestSpot() {
   return minimax(gameData, currentPlayer).index;
@@ -92,6 +132,10 @@ function emptySpot() {
     if(!cur.checked) acc.push(index);
     return acc;
   }, []);
+}
+
+function isaTie() {
+  return emptySpot().length === 0;
 }
 
 function minimax(newGameData, player) {
@@ -142,6 +186,10 @@ function minimax(newGameData, player) {
     }
   }
   return moves[bestMove];
+}
+
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 })();
