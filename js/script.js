@@ -65,18 +65,11 @@ gameContainer.addEventListener('click', function(e) {
       gameData[index].checked = true;
       gameData[index].player = currentPlayer;
       renderScreen();
-      var combination = winning(gameData, currentPlayer);
-      if(typeof combination !== 'undefined') {
-        combination.forEach(function(item) {
-          document.querySelector("[data-index='"+item+"']").style.color = 'black';
-        });
-        setTimeout(function() {
-          showMessage('Your ' + currentPlayer.name + ' is unbeatable!');
-          changePlayer();
-        }, 1000);
-      } else {
-        changePlayer();
+      if(winning(gameData, currentPlayer)) {
+        alert(currentPlayer.name + ' won!');
+        return false;
       }
+      changePlayer();
       if(againstComputer) {
         computerPay();
       }
